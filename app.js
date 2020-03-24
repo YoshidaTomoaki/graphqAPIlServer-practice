@@ -65,14 +65,14 @@ const resolvers = {
             if(parent.normal){
                 return 'NormalUser'
             }
-
-            return null
+            return 
         }
     },
     Query: {
         hello: () => 'Test Hello!',
         hello2: ()=> 'Test Hello2!',
-        users: (parent, args)=>{
+        users: (parent, args, context)=>{
+            console.log('context test testuid:',context.uid)
             
             let result = users;
             let limit = args.limit || null;            
@@ -118,7 +118,14 @@ const resolvers = {
     }
 };
 
-const server = new ApolloServer({typeDefs, resolvers});
+const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    context: (integrationContext)=>{
+        const uid = integrationContext.req.headers.testuid || null
+        return {req: integrationContext.req, res: integrationContext.res, uid}
+    }
+});
 
 const app = express();
 server.applyMiddleware({ app });
