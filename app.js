@@ -2,6 +2,7 @@ const express = require('express');
 const { ApolloServer, gql } = require('apollo-server-express');
 const { users } = require('./users');
 const { items } = require('./items');
+const { status } = require('./status');
 const utils = require('./utils');
 
 const typeDefs = gql`    
@@ -20,6 +21,15 @@ const typeDefs = gql`
         role: String
         item: Item
     }
+    extend type SuperUser {
+        status: Status
+    }
+    type Status{
+        id: Int
+        str: Int
+        def: Int
+        speed: Int
+    }
     type NormalUser implements User {
         id: Int
         name: String
@@ -27,6 +37,9 @@ const typeDefs = gql`
         createdAt: String
         normal: Boolean
         role: String
+    }
+    extend type NormalUser {
+        status: Status
     }
     enum Category {
         Rock
@@ -68,11 +81,21 @@ const resolvers = {
             return 
         }
     },
+    SuperUser: {
+        status:(parent, context, info)=>{
+            return status[parent.id];
+        }
+    },
+    NormalUser: {
+        status:(parent, context, info)=>{
+            return status[parent.id];
+        }
+    },
     Query: {
         hello: () => 'Test Hello!',
         hello2: ()=> 'Test Hello2!',
         users: (parent, args, context)=>{
-            console.log('context test testuid:',context.uid)
+            console.log('contextTest testUid:',context.uid)
             
             let result = users;
             let limit = args.limit || null;            
